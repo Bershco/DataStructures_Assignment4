@@ -1,3 +1,4 @@
+import java.util.LinkedList;
 import java.util.List;
 
 public class BacktrackingBTree<T extends Comparable<T>> extends BTree<T> {
@@ -12,6 +13,7 @@ public class BacktrackingBTree<T extends Comparable<T>> extends BTree<T> {
 
 	//You are to implement the function Backtrack.
 	public void Backtrack() {
+
 		// You should remove the next two lines, after double-checking that the signature is valid!
 	    IntegrityStatement.signature(); // Reminder!
 	    throw new UnsupportedOperationException("You should implement this");
@@ -19,8 +21,11 @@ public class BacktrackingBTree<T extends Comparable<T>> extends BTree<T> {
 	
 	//Change the list returned to a list of integers answering the requirements
 	public static List<Integer> BTreeBacktrackingCounterExample(){
-		// You should remove the next two lines, after double-checking that the signature is valid!
-	    IntegrityStatement.signature(); // Reminder!
-	    throw new UnsupportedOperationException("You should implement this");
+		List<Integer> difference = new LinkedList<>();
+		int curr = 1;
+		while (curr < 7) {
+			difference.add(curr++);
+		}
+		return difference;
 	}
 }

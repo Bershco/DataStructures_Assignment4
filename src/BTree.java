@@ -1,12 +1,14 @@
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Stack;
 
 
 @SuppressWarnings("unchecked")
 public class BTree<T extends Comparable<T>> {
 
     final private int maxDegree;
-
+    protected Stack<Object[]> backtrackingStack = new Stack<>();
+    // [ value ] , [ isLeaf ] , [ wasSplit ] , [ LeftNode ] , [ RightNode ]
     protected Node<T> root = null;
     protected int size = 0;
     
@@ -130,7 +132,7 @@ public class BTree<T extends Comparable<T>> {
         
         return copy;
     }
-    
+
 
     /**
      * @param value - a valid value that may be in the tree.
