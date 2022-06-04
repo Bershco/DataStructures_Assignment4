@@ -1,8 +1,4 @@
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.*;
 
 public class AVLTree implements Iterable<Integer> {
     // You may edit the following nested class:
@@ -33,9 +29,13 @@ public class AVLTree implements Iterable<Integer> {
     }
     
     protected Node root;
-    
+
     //You may add fields here.
-    
+    // add information about the construction of the array here
+    // [WhatHappened],[value]
+    // [WhatHappened : 'I' - node inserted & its parent, 'R' - rotation information (R - right, L - left), the node itself and its relevant relations
+    protected Deque<Object[]> backtrackingADT = new ArrayDeque<>();
+
     public AVLTree() {
     	this.root = null;
     }
@@ -51,11 +51,13 @@ public class AVLTree implements Iterable<Integer> {
 	    // Perform regular BST insertion
         if (node == null) {
         	Node insertedNode = new Node(value);
+            //SHOULD HAPPEN FIRST - because of recursion chronological order
+            backtrackingADT.addFirst(new Object[]{'I', 'I', insertedNode, insertedNode.parent});
             return insertedNode;
         }
 
         if (value < node.value) {
-            node.left  = insertNode(node.left, value);
+            node.left = insertNode(node.left, value);
             node.left.parent = node;
         }
         else {
@@ -71,18 +73,21 @@ public class AVLTree implements Iterable<Integer> {
          */
         
         int balance = node.getBalanceFactor();
-        
         if (balance > 1) {
             if (value > node.left.value) {
+                backtrackingADT.addFirst(new Object[]{'R', 'L', node, node.right, node.right.left});
                 node.left = rotateLeft(node.left);
+
             }
-            
+            backtrackingADT.addFirst(new Object[]{'R', 'R', node, node.left, node.left.right});
             node = rotateRight(node);
-        } else if (balance < -1) {
+        }
+        else if (balance < -1) {
             if (value < node.right.value) {
+                backtrackingADT.addFirst(new Object[]{'R', 'R', node, node.left, node.left.right});
                 node.right = rotateRight(node.right);
             }
-            
+            backtrackingADT.addFirst(new Object[]{'R', 'L', node, node.right, node.right.left});
             node = rotateLeft(node);
         }
 
