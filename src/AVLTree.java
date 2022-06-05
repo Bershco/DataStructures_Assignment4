@@ -35,7 +35,7 @@ public class AVLTree implements Iterable<Integer> {
     // [WhatHappened],[value]
     // [WhatHappened : info.INSERTION - node inserted & its parent, info.ROTATION - rotation information (R - right, L - left), the node itself and its relevant relations
     protected Deque<Object[]> backtrackingADT = new ArrayDeque<>();
-    protected enum info {insertion, leftRotation, rightRotation}
+    protected enum info {insertion, leftRotation, rightRotation, empty}
 
     public AVLTree() {
     	this.root = null;
