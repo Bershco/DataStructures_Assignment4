@@ -10,9 +10,19 @@ public class BacktrackingAVL extends AVLTree {
 
 	//You are to implement the function Backtrack.
     public void Backtrack() {
-        // You should remove the next two lines, after double-checking that the signature is valid!
-        IntegrityStatement.signature(); // Reminder!
-        throw new UnsupportedOperationException("You should implement this");
+        Object[] information = backtrackingADT.removeFirst();
+        if (information[0].equals(info.INSERTION)) {
+            Object[] followup1 = backtrackingADT.removeFirst();
+            if (followup1[0].equals(info.INSERTION)) {
+                backtrackingADT.addFirst(followup1);
+            }
+            else { //then followup1[0] is info.ROTATION
+                Object[] followup2 = backtrackingADT.removeFirst();
+                if (followup2[0].equals(info.INSERTION)) {
+                    backtrackingADT.addFirst(followup2);
+                }
+            }
+        }
     }
     
     //Change the list returned to a list of integers answering the requirements
