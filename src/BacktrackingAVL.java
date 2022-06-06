@@ -1,5 +1,3 @@
-import jdk.jshell.spi.ExecutionControl;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,25 +9,51 @@ public class BacktrackingAVL extends AVLTree {
 
 	//You are to implement the function Backtrack.
     public void Backtrack() {
-        Object[] inserted = backtrackingADT.removeFirst();
+        Object[] firstOut = !backtrackingADT.isEmpty() ? backtrackingADT.removeFirst() : new Object[]{info.empty};
+        Object[] secondOut = !backtrackingADT.isEmpty() ? backtrackingADT.removeFirst() : new Object[]{info.empty};
+        Object[] thirdOut = !backtrackingADT.isEmpty() ? backtrackingADT.removeFirst() : new Object[]{info.empty};
+        Object[] inserted,firstRotation,secondRotation;
+        /*
+            The next if & else if & else clauses determine the proper objects inserted,firstRotation,secondRotation - if they're properly defined.
+         */
+        if (firstOut[0].equals(info.insertion)) {
+            inserted = firstOut;
+            firstRotation = new Object[]{info.empty};
+            secondRotation = new Object[]{info.empty};
+            if (!thirdOut[0].equals(info.empty)) {
+                backtrackingADT.addFirst(thirdOut);
+            }
+            if (!secondOut[0].equals(info.empty)) {
+                backtrackingADT.addFirst(secondOut);
+            }
+        } else if (secondOut[0].equals(info.insertion)) {
+            inserted = secondOut;
+            firstRotation = firstOut;
+            secondRotation = new Object[]{info.empty};
+            if (!thirdOut[0].equals(info.empty)) {
+                backtrackingADT.addFirst(thirdOut);
+            }
+        } else {
+            inserted = thirdOut;
+            firstRotation = secondOut;
+            secondRotation = firstOut;
+        }
         if (inserted[0].equals(info.insertion)) {
-            Object[] possibleRotation1 = !backtrackingADT.isEmpty() ? backtrackingADT.removeFirst() : new Object[]{info.empty};
-            Object[] possibleRotation2 = !backtrackingADT.isEmpty() ? backtrackingADT.removeFirst() : new Object[]{info.empty};
             /*  The conditional operator above sets both variables as a proper array of rotations
                 Or, if the backtracking deque is empty (either by the first or by the second), it sets
                 the variable(s) as an array containing ONLY info.empty - as this is an option
                 the rest of the code uses to stop itself from canceling a non-existing rotation.
              */
-            if (possibleRotation1[0].equals(info.rightRotation)||possibleRotation1[0].equals(info.leftRotation)) { //then possibleRotation1 is information about a rotation
-                if (possibleRotation2[0].equals(info.insertion)||possibleRotation2[0].equals(info.empty)) { //the rotation was either right-right or left-left
-                    if (possibleRotation2[0].equals(info.insertion)) {
-                        backtrackingADT.addFirst(possibleRotation2);
+            if (firstRotation[0].equals(info.rightRotation)||firstRotation[0].equals(info.leftRotation)) { //then possibleRotation1 is information about a rotation
+                if (secondRotation[0].equals(info.insertion)||secondRotation[0].equals(info.empty)) { //the rotation was either right-right or left-left
+                    if (secondRotation[0].equals(info.insertion)) {
+                        backtrackingADT.addFirst(secondRotation);
                     }
                     //starting next line, is the code to remove the inserted node from the AVL tree efficiently whilst undoing the single rotation
-                    Node x = (Node) possibleRotation1[1];
-                    Node y = (Node) possibleRotation1[2];
-                    Node T2 = (Node) possibleRotation1[3];
-                    if (possibleRotation1[0].equals(info.leftRotation)) {
+                    Node x = (Node) firstRotation[1];
+                    Node y = (Node) firstRotation[2];
+                    Node T2 = (Node) firstRotation[3];
+                    if (firstRotation[0].equals(info.leftRotation)) {
                         if (T2 != null) {
                              T2.parent = y;
                         }
@@ -43,7 +67,7 @@ public class BacktrackingAVL extends AVLTree {
                         y.left = T2;
                         y.parent = x;
                     }
-                    else if (possibleRotation1[0].equals(info.rightRotation)) {
+                    else if (firstRotation[0].equals(info.rightRotation)) {
                         if (T2 != null) {
                             T2.parent = y;
                         }
@@ -64,40 +88,40 @@ public class BacktrackingAVL extends AVLTree {
                     /*  then both possibleRotation1 and possibleRotation2 are information about rotations (either left&right or right&left)
                         also - the rotation was either right-left or left-right
                         starting next line, is the code to remove the inserted node from the AVL tree efficiently whilst undoing the double rotation */
-                    throw new UnsupportedOperationException();
+                    if (firstRotation[0].equals(info.rightRotation) && secondRotation[0].equals(info.leftRotation)) {
+
+                    } else if (firstRotation[0].equals(info.leftRotation) && secondRotation[0].equals(info.rightRotation)) {
+
+                    } else throw new IllegalArgumentException("How did you even get here?");
                 }
             }
             else {
-                if (!possibleRotation2[0].equals(info.empty)) {
-                    backtrackingADT.add(possibleRotation2);
+                if (!secondRotation[0].equals(info.empty)) {
+                    backtrackingADT.add(secondRotation);
                 }
-                if (possibleRotation1[0].equals(info.insertion)) {
-                    backtrackingADT.addFirst(possibleRotation1);
+                if (firstRotation[0].equals(info.insertion)) {
+                    backtrackingADT.addFirst(firstRotation);
                     /*
                     Only option of getting here means possibleRotation1[0] is info.insertion OR info.empty, if it is info.empty,
                     we don't want it in the backtracking deque, but if it's info.insertion, we do.
                      */
                 }
-                //starting next line, is the code to remove the node from the AVL tree efficiently
-                Node insertedNode = (Node) inserted[1];
-                Node insertedNodeParent = (Node) inserted[2];
-                insertedNode.parent = null;
-                if (insertedNode.value < insertedNodeParent.value) {
-                    insertedNodeParent.left = null;
-                }
-                else if (insertedNode.value > insertedNodeParent.value) {
-                    insertedNodeParent.right = null;
-                }
-                Node recurringParent = insertedNodeParent;
-                while (recurringParent != null) {
-                    recurringParent.updateHeight();
-                    recurringParent = recurringParent.parent;
-                }
-                //Reset the parent field of the node inserted, and the proper child field (left\right) of the inserted node's parent
             }
-        }
-        else {
-            System.out.println("For some reason, the next object array in the backtracking deque is information about a rotation, and not about insertion, as needed.");
+            //starting next line, is the code to remove the node from the AVL tree efficiently
+            Node insertedNode = (Node) inserted[1];
+            Node insertedNodeParent = (Node) inserted[2];
+            insertedNode.parent = null;
+            if (insertedNode.value < insertedNodeParent.value) {
+                insertedNodeParent.left = null;
+            }
+            else if (insertedNode.value > insertedNodeParent.value) {
+                insertedNodeParent.right = null;
+            }
+            Node recurringParent = insertedNodeParent;
+            while (recurringParent != null) {
+                recurringParent.updateHeight();
+                recurringParent = recurringParent.parent;
+            }   //Reset the parent field of the node inserted, and the proper child field (left\right) of the inserted node's parent
         }
     }
     
