@@ -1,13 +1,12 @@
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Stack;
+import java.util.*;
 
 
 @SuppressWarnings("unchecked")
 public class BTree<T extends Comparable<T>> {
 
     final private int maxDegree;
-    protected Stack<Object[]> backtrackingStack = new Stack<>();
+    //protected Stack<Object[]> backtrackingStack = new Stack<>();
+    protected Deque<Object[]> backtrackingDLL = new ArrayDeque<>();
     // [ value ] , [ isLeaf ] , [ wasSplit ] , [ LeftNode ] , [ RightNode ]
     protected Node<T> root = null;
     protected int size = 0;
@@ -46,6 +45,8 @@ public class BTree<T extends Comparable<T>> {
         if (root == null) {
             root = new Node<T>(null, maxDegree);
             root.addKey(value);
+            Object[] obj = {value,true,false,null,null} ;
+            backtrackingDLL.add(obj);
         } else {
             Node<T> currentNode = root;
             boolean wasAdded = false;
@@ -53,7 +54,9 @@ public class BTree<T extends Comparable<T>> {
             	// If the node has 2t-1 keys then split it
                 if (currentNode.getNumberOfKeys() == maxDegree - 1) {
                 	split(currentNode);
-                	
+
+
+
                 	// Return to the parent and descend to the needed node
                 	currentNode = currentNode.parent != null ? currentNode.parent : root;
                     int idx = currentNode.getValuePosition(value);
@@ -84,7 +87,6 @@ public class BTree<T extends Comparable<T>> {
         int numberOfKeys = node.getNumberOfKeys();
         int medianIndex = numberOfKeys / 2;
         T medianValue = node.getKey(medianIndex);
-
         // Create the new nodes
         Node<T> left = createPartialNodeCopy(node, 0, medianIndex);
         Node<T> right = createPartialNodeCopy(node, medianIndex + 1, numberOfKeys);
