@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -132,15 +133,7 @@ public class BacktrackingAVL extends AVLTree {
     
     //Change the list returned to a list of integers answering the requirements
     public static List<Integer> AVLTreeBacktrackingCounterExample() {
-        // You should remove the next two lines, after double-checking that the signature is valid!
-        List<Integer> difference = new LinkedList<>();
-        difference.add(2);
-        difference.add(1);
-        difference.add(5);
-        difference.add(3);
-        difference.add(6);
-        difference.add(4);
-        return difference;
+        return Arrays.asList(2,1,5,3,6,4);
     }
     
     public int Select(int index) {
