@@ -15,6 +15,7 @@ public class BacktrackingAVL extends AVLTree {
         Object[] inserted,firstRotation,secondRotation;
         /*
             The next if & else if & else clauses determine the proper objects inserted,firstRotation,secondRotation - if they're properly defined.
+            also puts back information about backtracking unrelated to the current backtrack.
          */
         if (firstOut[0].equals(info.insertion)) {
             inserted = firstOut;
@@ -44,11 +45,8 @@ public class BacktrackingAVL extends AVLTree {
                 the variable(s) as an array containing ONLY info.empty - as this is an option
                 the rest of the code uses to stop itself from canceling a non-existing rotation.
              */
-            if (firstRotation[0].equals(info.rightRotation)||firstRotation[0].equals(info.leftRotation)) { //then possibleRotation1 is information about a rotation
-                if (secondRotation[0].equals(info.insertion)||secondRotation[0].equals(info.empty)) { //the rotation was either right-right or left-left
-                    if (secondRotation[0].equals(info.insertion)) {
-                        backtrackingADT.addFirst(secondRotation);
-                    }
+            if (firstRotation[0].equals(info.rightRotation) || firstRotation[0].equals(info.leftRotation)) { //then possibleRotation1 is information about a rotation
+                if (secondRotation[0].equals(info.insertion) || secondRotation[0].equals(info.empty)) { //the rotation was either right-right or left-left
                     //starting next line, is the code to remove the inserted node from the AVL tree efficiently whilst undoing the single rotation
                     Node x = (Node) firstRotation[1];
                     Node y = (Node) firstRotation[2];
@@ -88,23 +86,30 @@ public class BacktrackingAVL extends AVLTree {
                     /*  then both possibleRotation1 and possibleRotation2 are information about rotations (either left&right or right&left)
                         also - the rotation was either right-left or left-right
                         starting next line, is the code to remove the inserted node from the AVL tree efficiently whilst undoing the double rotation */
+                    Node x = (Node) firstRotation[1];
+                    Node y = (Node) firstRotation[2];
+                    Node T2 = (Node) firstRotation[3];
                     if (firstRotation[0].equals(info.rightRotation) && secondRotation[0].equals(info.leftRotation)) {
-
+                        if (T2 != null) {
+                            x.parent = T2.parent;
+                            T2.parent = y;
+                            T2.right = y.left;
+                            T2.left = x.right;
+                        }
+                        y.parent = x;
+                        x.right = y;
+                        y.left = T2;
                     } else if (firstRotation[0].equals(info.leftRotation) && secondRotation[0].equals(info.rightRotation)) {
-
+                        if (T2 != null) {
+                            x.parent = T2.parent;
+                            T2.parent = y;
+                            T2.left = y.right;
+                            T2.right = x.left;
+                        }
+                        y.parent = x;
+                        x.left = y;
+                        y.right = T2;
                     } else throw new IllegalArgumentException("How did you even get here?");
-                }
-            }
-            else {
-                if (!secondRotation[0].equals(info.empty)) {
-                    backtrackingADT.add(secondRotation);
-                }
-                if (firstRotation[0].equals(info.insertion)) {
-                    backtrackingADT.addFirst(firstRotation);
-                    /*
-                    Only option of getting here means possibleRotation1[0] is info.insertion OR info.empty, if it is info.empty,
-                    we don't want it in the backtracking deque, but if it's info.insertion, we do.
-                     */
                 }
             }
             //starting next line, is the code to remove the node from the AVL tree efficiently
