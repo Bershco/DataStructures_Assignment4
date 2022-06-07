@@ -8,6 +8,7 @@ public class AVLTree implements Iterable<Integer> {
     	public Node parent = null;
     	public int height = 0;
     	public int value;
+        protected int size = 0;
 
     	public Node(int val) {
             this.value = val;
@@ -18,6 +19,18 @@ public class AVLTree implements Iterable<Integer> {
             int rightHeight = (right == null) ? -1 : right.height;
 
             height = Math.max(leftHeight, rightHeight) + 1;
+        }
+        protected void updateSizeDownwardsRecursively(int compared) {
+            //will use later to update the size of relevant nodes after backtracking
+            size = 1;
+            if (compared < value && left != null) {
+                left.updateSizeDownwardsRecursively(compared);
+            }
+            if (compared > value && right != null) {
+                right.updateSizeDownwardsRecursively(compared);
+            }
+            size += (left!=null) ? left.size : 0;
+            size += (right!=null) ? right.size : 0;
         }
 
         public int getBalanceFactor() {
@@ -46,22 +59,26 @@ public class AVLTree implements Iterable<Integer> {
      */
 	public void insert(int value) {
     	root = insertNode(root, value);
+        root.size++;
     }
 	
 	protected Node insertNode(Node node, int value) {
 	    // Perform regular BST insertion
         if (node == null) {
         	Node insertedNode = new Node(value);
+            insertedNode.size = 0;  //each call to the insertNode method is followed by incrementation of size
             //next line should happen first (in order of adding backtracking information) - because of recursion chronological order
             backtrackingADT.addFirst(new Object[]{info.insertion, insertedNode, insertedNode.parent});
             return insertedNode;
         }
         if (value < node.value) {
             node.left = insertNode(node.left, value);
+            node.left.size++;
             node.left.parent = node;
         }
         else {
             node.right = insertNode(node.right, value);
+            node.right.size++;
             node.right.parent = node;
         }
             
@@ -90,7 +107,6 @@ public class AVLTree implements Iterable<Integer> {
             backtrackingADT.addFirst(new Object[]{info.leftRotation, node, node.right, node.right.left});
             node = rotateLeft(node);
         }
-
         return node;
     }
     

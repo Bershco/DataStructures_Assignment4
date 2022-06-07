@@ -1,5 +1,4 @@
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 public class BacktrackingAVL extends AVLTree {
@@ -47,11 +46,11 @@ public class BacktrackingAVL extends AVLTree {
                 the rest of the code uses to stop itself from canceling a non-existing rotation.
              */
             if (firstRotation[0].equals(info.rightRotation) || firstRotation[0].equals(info.leftRotation)) { //then possibleRotation1 is information about a rotation
+                Node x = (Node) firstRotation[1];
+                Node y = (Node) firstRotation[2];
+                Node T2 = (Node) firstRotation[3];
                 if (secondRotation[0].equals(info.insertion) || secondRotation[0].equals(info.empty)) { //the rotation was either right-right or left-left
                     //starting next line, is the code to remove the inserted node from the AVL tree efficiently whilst undoing the single rotation
-                    Node x = (Node) firstRotation[1];
-                    Node y = (Node) firstRotation[2];
-                    Node T2 = (Node) firstRotation[3];
                     if (firstRotation[0].equals(info.leftRotation)) {
                         if (T2 != null) {
                              T2.parent = y;
@@ -87,9 +86,6 @@ public class BacktrackingAVL extends AVLTree {
                     /*  then both possibleRotation1 and possibleRotation2 are information about rotations (either left&right or right&left)
                         also - the rotation was either right-left or left-right
                         starting next line, is the code to remove the inserted node from the AVL tree efficiently whilst undoing the double rotation */
-                    Node x = (Node) firstRotation[1];
-                    Node y = (Node) firstRotation[2];
-                    Node T2 = (Node) firstRotation[3];
                     if (firstRotation[0].equals(info.rightRotation) && secondRotation[0].equals(info.leftRotation)) {
                         if (T2 != null) {
                             x.parent = T2.parent;
@@ -128,6 +124,7 @@ public class BacktrackingAVL extends AVLTree {
                 recurringParent.updateHeight();
                 recurringParent = recurringParent.parent;
             }   //Reset the parent field of the node inserted, and the proper child field (left\right) of the inserted node's parent
+            root.updateSizeDownwardsRecursively(insertedNode.value);
         }
     }
     
