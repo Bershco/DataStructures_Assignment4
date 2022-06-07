@@ -32,6 +32,29 @@ public class AVLTree implements Iterable<Integer> {
             size = (left != null) ? size + left.size : size;
             size = (right != null) ? size + right.size : size;
         }
+        protected int helpRank(int value) {
+            if (this.value == value) {
+                return (left != null) ? left.size + 1 : 1;
+            }
+            else if (this.value > value) {
+                return (left != null) ? left.helpRank(value) : 0;
+            }
+            else {
+                return (right != null) ? right.helpRank(value) + ((left != null) ? left.size + 1 : 1) : ((left != null) ? left.size + 1 : 1);
+            }
+        }
+        protected int helpSelect(int index) {
+            int rank = ((left != null) ? left.size + 1 : 1);
+            if (rank == index) {
+                return value;
+            }
+            else if (rank > index) {
+                return (left != null) ? left.helpSelect(index) : -1;
+            }
+            else {
+                return (right != null) ? right.helpSelect(index-rank) : -1;
+            }
+        }
 
         public int getBalanceFactor() {
             int leftHeight = (left == null) ? -1 : left.height;
