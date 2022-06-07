@@ -49,7 +49,7 @@ public class BacktrackingAVL extends AVLTree {
                 Node x = (Node) firstRotation[1];
                 Node y = (Node) firstRotation[2];
                 Node T2 = (Node) firstRotation[3];
-                if (secondRotation[0].equals(info.insertion) || secondRotation[0].equals(info.empty)) { //the rotation was either right-right or left-left
+                if (secondRotation[0].equals(info.insertion) || secondRotation[0].equals(info.empty)) { //the rotation was either right-right or left-left (i.e a single rotation)
                     //starting next line, is the code to remove the inserted node from the AVL tree efficiently whilst undoing the single rotation
                     if (firstRotation[0].equals(info.leftRotation)) {
                         if (T2 != null) {
@@ -83,8 +83,7 @@ public class BacktrackingAVL extends AVLTree {
                         throw new IllegalArgumentException("The first element of the object array should be information about the action performed");
                     }
                 } else {
-                    /*  then both possibleRotation1 and possibleRotation2 are information about rotations (either left&right or right&left)
-                        also - the rotation was either right-left or left-right
+                    /*  then both possibleRotation1 and possibleRotation2 are information about rotations (either left & right or right & left)
                         starting next line, is the code to remove the inserted node from the AVL tree efficiently whilst undoing the double rotation */
                     if (firstRotation[0].equals(info.rightRotation) && secondRotation[0].equals(info.leftRotation)) {
                         if (T2 != null) {
@@ -109,7 +108,7 @@ public class BacktrackingAVL extends AVLTree {
                     } else throw new IllegalArgumentException("How did you even get here?");
                 }
             }
-            //starting next line, is the code to remove the node from the AVL tree efficiently
+            //starting next line, is the code to remove the actual node from the AVL tree efficiently now that the rotations have been undone
             Node insertedNode = (Node) inserted[1];
             Node insertedNodeParent = (Node) inserted[2];
             insertedNode.parent = null;

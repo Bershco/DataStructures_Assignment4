@@ -29,8 +29,8 @@ public class AVLTree implements Iterable<Integer> {
             if (compared > value && right != null) {
                 right.updateSizeDownwardsRecursively(compared);
             }
-            size += (left!=null) ? left.size : 0;
-            size += (right!=null) ? right.size : 0;
+            size = (left != null) ? size + left.size : size;
+            size = (right != null) ? size + right.size : size;
         }
 
         public int getBalanceFactor() {
@@ -45,8 +45,6 @@ public class AVLTree implements Iterable<Integer> {
 
     //You may add fields here.
     // add information about the construction of the array here
-    // [WhatHappened],[value]
-    // [WhatHappened : info.INSERTION - node inserted & its parent, info.ROTATION - rotation information (R - right, L - left), the node itself and its relevant relations
     protected Deque<Object[]> backtrackingADT = new ArrayDeque<>();
     protected enum info {insertion, leftRotation, rightRotation, empty}
 
@@ -60,6 +58,7 @@ public class AVLTree implements Iterable<Integer> {
 	public void insert(int value) {
     	root = insertNode(root, value);
         root.size++;
+        root.updateSizeDownwardsRecursively(value);
     }
 	
 	protected Node insertNode(Node node, int value) {
