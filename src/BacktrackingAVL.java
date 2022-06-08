@@ -1,4 +1,3 @@
-import java.rmi.UnexpectedException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,27 +11,28 @@ public class BacktrackingAVL extends AVLTree {
     public void Backtrack() {
         Object[] info = backtrackingADT.removeFirst();
         switch ((ImbalanceCases)info[4]) {
-            case NO_IMBALANCE -> {
+            case NO_IMBALANCE:
                 removeInserted((Node) info[0], (Node) info[1]);
-            }
-            case LEFT_LEFT -> {
+                break;
+            case LEFT_LEFT:
                 removeInserted((Node) info[0], (Node) info[1]);
                 rotateLeft((Node)info[3]);
-            }
-            case LEFT_RIGHT -> {
+                break;
+
+            case LEFT_RIGHT:
                 removeInserted((Node) info[0], (Node) info[1]);
                 rotateLeft((Node)info[3]);
                 rotateRight((Node)info[2]);
-            }
-            case RIGHT_RIGHT -> {
+                break;
+            case RIGHT_RIGHT:
                 removeInserted((Node) info[0], (Node) info[1]);
                 rotateRight((Node)info[3]);
-            }
-            case RIGHT_LEFT -> {
+                break;
+            case RIGHT_LEFT:
                 removeInserted((Node) info[0], (Node) info[1]);
                 rotateRight((Node)info[3]);
                 rotateLeft((Node)info[3]);
-            }
+                break;
         }
     }
     private void removeInserted(Node child, Node parent) {

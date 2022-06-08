@@ -85,8 +85,8 @@ public class AVLTree implements Iterable<Integer> {
             node.right = insertNode(node.right, value);
             node.right.parent = node;
         }
-        if ((node.right != null && node.right.value == ((Node)info[0]).value) ||
-                (node.left != null && node.left.value == ((Node)info[0]).value)) {
+        if ((node.right != null & node.right.value == ((Node)info[0]).value) ||
+                (node.left != null & node.left.value == ((Node)info[0]).value)) {
             info[1] = node;
         } //this will happen only once - when 'node' is info[0]'s parent
         node.size++;
