@@ -12,6 +12,7 @@ public class AVLTree implements Iterable<Integer> {
     	public Node parent = null;
     	public int height = 0;
     	public int value;
+        protected int size = 1;
 
     	public Node(int val) {
             this.value = val;
@@ -29,6 +30,29 @@ public class AVLTree implements Iterable<Integer> {
             int rightHeight = (right == null) ? -1 : right.height;
 
             return leftHeight - rightHeight;
+        }
+        protected int helpRank(int _value) {
+            if (value == _value) {
+                return (left != null) ? left.size + 1 : 1;
+            }
+            else if (value > _value) {
+                return (left != null) ? left.helpRank(_value) : 0;
+            }
+            else {
+                return (right != null) ? right.helpRank(_value) + ((left != null) ? left.size + 1 : 1) : ((left != null) ? left.size + 1 : 1);
+            }
+        }
+        protected int helpSelect(int index) {
+            int rank = (left != null) ? left.size + 1 : 1;
+            if (rank == index) {
+                return value;
+            }
+            else if (rank > index) {
+                return (left != null) ? left.helpSelect(index) : -1;
+            }
+            else {
+                return (right != null) ? right.helpSelect(index-rank) : -1;
+            }
         }
     }
     
@@ -62,7 +86,8 @@ public class AVLTree implements Iterable<Integer> {
             node.right = insertNode(node.right, value);
             node.right.parent = node;
         }
-            
+        node.size++;
+
         node.updateHeight();
 
         /* 
@@ -109,6 +134,13 @@ public class AVLTree implements Iterable<Integer> {
         y.updateHeight();
         x.updateHeight();
 
+        /*
+            Now properly adjusting sizes - x is exactly where y was before, and now y is x's right child -
+            meaning its size is as x minus the left child (if exists) minus 1.
+         */
+        x.size = y.size;
+        y.size = (x.left != null) ? x.size - x.left.size -1 : x.size - 1;
+
         // Return new root
         return x;
     }
@@ -131,6 +163,13 @@ public class AVLTree implements Iterable<Integer> {
         
         x.updateHeight();
         y.updateHeight();
+
+         /*
+            Now properly adjusting sizes - y is exactly where x was before, and now x is y's left child -
+            meaning its size is as y minus the right child (if exists) minus 1.
+         */
+        y.size = x.size;
+        x.size = (y.right != null) ? y.size - y.right.size -1 : y.size - 1;
 
         // Return new root
         return y;

@@ -21,14 +21,10 @@ public class BacktrackingAVL extends AVLTree {
     }
     
     public int Select(int index) {
-        // You should remove the next two lines, after double-checking that the signature is valid!
-        IntegrityStatement.signature(); // Reminder!
-        throw new UnsupportedOperationException("You should implement this");
+        return root.helpSelect(index);
     }
     
     public int Rank(int value) {
-        // You should remove the next two lines, after double-checking that the signature is valid!
-        IntegrityStatement.signature(); // Reminder!
-        throw new UnsupportedOperationException("You should implement this");
+        return root.helpRank(value);
     }
 }
