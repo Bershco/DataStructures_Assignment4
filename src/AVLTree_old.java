@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class AVLTree implements Iterable<Integer> {
+public class AVLTree_old implements Iterable<Integer> {
     // You may edit the following nested class:
     protected class Node {
     	public Node left = null;
@@ -71,7 +71,7 @@ public class AVLTree implements Iterable<Integer> {
     protected Deque<Object[]> backtrackingADT = new ArrayDeque<>();
     protected enum info {insertion, leftRotation, rightRotation, empty}
 
-    public AVLTree() {
+    public AVLTree_old() {
     	this.root = null;
     }
     
@@ -322,7 +322,7 @@ public class AVLTree implements Iterable<Integer> {
         }
 
         @Override
-        protected void addValues(AVLTree.Node node) {
+        protected void addValues(AVLTree_old.Node node) {
             if (node != null) {
                 addNode(node);
                 addValues(node.left);
