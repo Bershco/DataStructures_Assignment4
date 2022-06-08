@@ -32,7 +32,7 @@ public class AVLTree_BackTracking_Tests {
 
     public static void main(String[] args) {
 
-        boolean Read_The_Instructions = false;
+        boolean Read_The_Instructions = true;
         if(Read_The_Instructions == false) throw new RuntimeException("READ THE INSTRUCTIONS FIRST!");
 
         // main tests

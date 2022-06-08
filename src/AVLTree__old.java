@@ -1,8 +1,4 @@
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.*;
 
 public class AVLTree implements Iterable<Integer> {
     // You may edit the following nested class:
@@ -12,6 +8,7 @@ public class AVLTree implements Iterable<Integer> {
     	public Node parent = null;
     	public int height = 0;
     	public int value;
+        protected int size = 0;
 
     	public Node(int val) {
             this.value = val;
@@ -23,6 +20,41 @@ public class AVLTree implements Iterable<Integer> {
 
             height = Math.max(leftHeight, rightHeight) + 1;
         }
+        protected void updateSizeDownwardsRecursively(int compared) {
+            //will use later to update the size of relevant nodes after backtracking
+            size = 1;
+            if (compared < value && left != null) {
+                left.updateSizeDownwardsRecursively(compared);
+            }
+            if (compared > value && right != null) {
+                right.updateSizeDownwardsRecursively(compared);
+            }
+            size = (left != null) ? size + left.size : size;
+            size = (right != null) ? size + right.size : size;
+        }
+        protected int helpRank(int value) {
+            if (this.value == value) {
+                return (left != null) ? left.size + 1 : 1;
+            }
+            else if (this.value > value) {
+                return (left != null) ? left.helpRank(value) : 0;
+            }
+            else {
+                return (right != null) ? right.helpRank(value) + ((left != null) ? left.size + 1 : 1) : ((left != null) ? left.size + 1 : 1);
+            }
+        }
+        protected int helpSelect(int index) {
+            int rank = ((left != null) ? left.size + 1 : 1);
+            if (rank == index) {
+                return value;
+            }
+            else if (rank > index) {
+                return (left != null) ? left.helpSelect(index) : -1;
+            }
+            else {
+                return (right != null) ? right.helpSelect(index-rank) : -1;
+            }
+        }
 
         public int getBalanceFactor() {
             int leftHeight = (left == null) ? -1 : left.height;
@@ -33,9 +65,12 @@ public class AVLTree implements Iterable<Integer> {
     }
     
     protected Node root;
-    
+
     //You may add fields here.
-    
+    // add information about the construction of the array here
+    protected Deque<Object[]> backtrackingADT = new ArrayDeque<>();
+    protected enum info {insertion, leftRotation, rightRotation, empty}
+
     public AVLTree() {
     	this.root = null;
     }
@@ -45,22 +80,33 @@ public class AVLTree implements Iterable<Integer> {
      */
 	public void insert(int value) {
     	root = insertNode(root, value);
+        root.size++;
+        root.updateSizeDownwardsRecursively(value);
     }
 	
 	protected Node insertNode(Node node, int value) {
 	    // Perform regular BST insertion
         if (node == null) {
         	Node insertedNode = new Node(value);
+            insertedNode.size = 0;  //each call to the insertNode method is followed by incrementation of size
+            //next line should happen first (in order of adding backtracking information) - because of recursion chronological order
             return insertedNode;
         }
-
         if (value < node.value) {
-            node.left  = insertNode(node.left, value);
+            node.left = insertNode(node.left, value);
+            node.left.size++;
             node.left.parent = node;
+            if (node.left.left == null && node.left.right == null) {
+                backtrackingADT.addFirst(new Object[]{info.insertion, node.left, node});
+            }
         }
         else {
             node.right = insertNode(node.right, value);
+            node.right.size++;
             node.right.parent = node;
+            if (node.right.left == null && node.right.right == null) {
+                backtrackingADT.addFirst(new Object[]{info.insertion, node.right, node});
+            }
         }
             
         node.updateHeight();
@@ -71,21 +117,23 @@ public class AVLTree implements Iterable<Integer> {
          */
         
         int balance = node.getBalanceFactor();
-        
         if (balance > 1) {
             if (value > node.left.value) {
+                backtrackingADT.addFirst(new Object[]{info.leftRotation, node.left, node.left.right, node.left.right.left});
                 node.left = rotateLeft(node.left);
+
             }
-            
+            backtrackingADT.addFirst(new Object[]{info.rightRotation, node, node.left, node.left.right});
             node = rotateRight(node);
-        } else if (balance < -1) {
+        }
+        else if (balance < -1) {
             if (value < node.right.value) {
+                backtrackingADT.addFirst(new Object[]{info.rightRotation, node.right, node.right.left, node.right.left.right});
                 node.right = rotateRight(node.right);
             }
-            
+            backtrackingADT.addFirst(new Object[]{info.leftRotation, node, node.right, node.right.left});
             node = rotateLeft(node);
         }
-
         return node;
     }
     
