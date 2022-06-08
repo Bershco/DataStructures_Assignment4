@@ -1,3 +1,5 @@
+import java.rmi.UnexpectedException;
+import java.util.Arrays;
 import java.util.List;
 
 public class BacktrackingAVL extends AVLTree {
@@ -8,23 +10,60 @@ public class BacktrackingAVL extends AVLTree {
 
 	//You are to implement the function Backtrack.
     public void Backtrack() {
-        // You should remove the next two lines, after double-checking that the signature is valid!
-        IntegrityStatement.signature(); // Reminder!
-        throw new UnsupportedOperationException("You should implement this");
+        Object[] info = backtrackingADT.removeFirst();
+        switch ((ImbalanceCases)info[4]) {
+            case NO_IMBALANCE -> {
+                removeInserted((Node) info[0], (Node) info[1]);
+            }
+            case LEFT_LEFT -> {
+                removeInserted((Node) info[0], (Node) info[1]);
+                rotateLeft((Node)info[3]);
+            }
+            case LEFT_RIGHT -> {
+                removeInserted((Node) info[0], (Node) info[1]);
+                rotateLeft((Node)info[3]);
+                rotateRight((Node)info[2]);
+            }
+            case RIGHT_RIGHT -> {
+                removeInserted((Node) info[0], (Node) info[1]);
+                rotateRight((Node)info[3]);
+            }
+            case RIGHT_LEFT -> {
+                removeInserted((Node) info[0], (Node) info[1]);
+                rotateRight((Node)info[3]);
+                rotateLeft((Node)info[3]);
+            }
+        }
+    }
+    private void removeInserted(Node child, Node parent) {
+        child.parent = null;
+        if (parent.right.equals(child)) {
+            parent.right = null;
+        } else {
+            parent.left = null;
+        }
     }
     
     //Change the list returned to a list of integers answering the requirements
     public static List<Integer> AVLTreeBacktrackingCounterExample() {
-        // You should remove the next two lines, after double-checking that the signature is valid!
-        IntegrityStatement.signature(); // Reminder!
-        throw new UnsupportedOperationException("You should implement this");
+        return Arrays.asList(2,1,5,3,6,4);
     }
     
     public int Select(int index) {
-        return root.helpSelect(index);
+        if (root != null) {
+            return root.helpSelect(index);
+        }
+        else {
+            return 0;
+        }
     }
     
     public int Rank(int value) {
-        return root.helpRank(value);
+        if (root != null) {
+            return root.helpRank(value);
+        }
+        else {
+            return 0;
+        }
     }
 }

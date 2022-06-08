@@ -1,8 +1,4 @@
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.*;
 
 public class AVLTree implements Iterable<Integer> {
     // You may edit the following nested class:
@@ -33,7 +29,7 @@ public class AVLTree implements Iterable<Integer> {
         }
         protected int helpRank(int _value) {
             if (value == _value) {
-                return (left != null) ? left.size + 1 : 1;
+                return (left != null) ? left.size : 0;
             }
             else if (value > _value) {
                 return (left != null) ? left.helpRank(_value) : 0;
@@ -59,6 +55,7 @@ public class AVLTree implements Iterable<Integer> {
     protected Node root;
     
     //You may add fields here.
+    protected Deque<Object[]> backtrackingADT = new ArrayDeque<>();
     
     public AVLTree() {
     	this.root = null;
@@ -72,9 +69,11 @@ public class AVLTree implements Iterable<Integer> {
     }
 	
 	protected Node insertNode(Node node, int value) {
-	    // Perform regular BST insertion
+        Object[] info = new Object[5];
+        // Perform regular BST insertion
         if (node == null) {
         	Node insertedNode = new Node(value);
+            info[0] = insertedNode;
             return insertedNode;
         }
 
@@ -86,6 +85,10 @@ public class AVLTree implements Iterable<Integer> {
             node.right = insertNode(node.right, value);
             node.right.parent = node;
         }
+        if ((node.right != null && node.right.value == ((Node)info[0]).value) ||
+                (node.left != null && node.left.value == ((Node)info[0]).value)) {
+            info[1] = node;
+        } //this will happen only once - when 'node' is info[0]'s parent
         node.size++;
 
         node.updateHeight();
@@ -96,19 +99,40 @@ public class AVLTree implements Iterable<Integer> {
          */
         
         int balance = node.getBalanceFactor();
-        
-        if (balance > 1) {
-            if (value > node.left.value) {
-                node.left = rotateLeft(node.left);
+        if (info[4] == null) { //only needs to happen in the lowest imbalanced node
+            if (balance > 1) {
+                if (value > node.left.value) {
+                    node.left = rotateLeft(node.left);
+                    info[2] = node.left;
+                }
+
+                node = rotateRight(node);
+                info[3] = node;
+                if (info[2] != null) {
+                    info[4] = ImbalanceCases.LEFT_RIGHT;
+                } else {
+                    info[4] = ImbalanceCases.LEFT_LEFT;
+                }
+                backtrackingADT.addFirst(info);
+            } else if (balance < -1) {
+                if (value < node.right.value) {
+                    node.right = rotateRight(node.right);
+                    info[2] = node.right;
+                }
+
+                node = rotateLeft(node);
+                info[3] = node;
+                if (info[2] != null) {
+                    info[4] = ImbalanceCases.RIGHT_LEFT;
+                } else {
+                    info[4] = ImbalanceCases.RIGHT_RIGHT;
+                }
+                backtrackingADT.addFirst(info);
             }
-            
-            node = rotateRight(node);
-        } else if (balance < -1) {
-            if (value < node.right.value) {
-                node.right = rotateRight(node.right);
+            if (info[4] == null && node.equals(root)) {
+                info[4] = ImbalanceCases.NO_IMBALANCE;
+                backtrackingADT.addFirst(info);
             }
-            
-            node = rotateLeft(node);
         }
 
         return node;
