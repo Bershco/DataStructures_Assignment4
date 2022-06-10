@@ -36,10 +36,8 @@ public class AVLTree_BackTracking_Tests {
         if(Read_The_Instructions == false) throw new RuntimeException("READ THE INSTRUCTIONS FIRST!");
 
         // main tests
-        mainTests();
-
-        /**   example call from end of failed instance presentation  **/
-        //AVLTreeDebugging(new int[]{125, -457, 383, -362, 438});
+        //mainTests();
+        AVLTreeDebugging(new int[]{474, 142, 357, -183, 386, 486, -94, -266, -382, -353, -96, 320, -54, -40, 468});
     }
 
     public static void AVLTreeDebugging(int[] nums){

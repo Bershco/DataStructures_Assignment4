@@ -55,7 +55,7 @@ public class AVLTree implements Iterable<Integer> {
     protected Node root;
     
     //You may add fields here.
-    protected Deque<Object[]> backtrackingADT = new ArrayDeque<>();
+    protected Deque<Object> backtrackingADT = new ArrayDeque<>();
     
     public AVLTree() {
     	this.root = null;
@@ -66,31 +66,36 @@ public class AVLTree implements Iterable<Integer> {
      */
 	public void insert(int value) {
     	root = insertNode(root, value);
+        if (root.right == null && root.left == null) {
+            backtrackingADT.addFirst(ImbalanceCases.NO_IMBALANCE);
+            backtrackingADT.addFirst(ImbalanceCases.NO_IMBALANCE); // filler for the backtrack method
+        }
     }
 	
 	protected Node insertNode(Node node, int value) {
-        Object[] info = new Object[5];
         // Perform regular BST insertion
         if (node == null) {
         	Node insertedNode = new Node(value);
-            info[0] = insertedNode;
+            backtrackingADT.addFirst(insertedNode);
             return insertedNode;
         }
 
         if (value < node.value) {
-            node.left  = insertNode(node.left, value);
+            node.left = insertNode(node.left, value);
             node.left.parent = node;
+            if (node.left.right == null && node.left.left == null) {
+                backtrackingADT.addFirst(node); //inserted node's parent
+            }
         }
         else {
             node.right = insertNode(node.right, value);
             node.right.parent = node;
+            if (node.right.right == null && node.right.left == null) {
+                backtrackingADT.addFirst(node); //inserted node's parent
+            }
         }
-        if ((node.right != null & node.right.value == ((Node)info[0]).value) ||
-                (node.left != null & node.left.value == ((Node)info[0]).value)) {
-            info[1] = node;
-        } //this will happen only once - when 'node' is info[0]'s parent
+        //this will happen only once - when 'node' is info[0]'s parent
         node.size++;
-
         node.updateHeight();
 
         /* 
@@ -99,41 +104,50 @@ public class AVLTree implements Iterable<Integer> {
          */
         
         int balance = node.getBalanceFactor();
-        if (info[4] == null) { //only needs to happen in the lowest imbalanced node
-            if (balance > 1) {
-                if (value > node.left.value) {
-                    node.left = rotateLeft(node.left);
-                    info[2] = node.left;
-                }
-
-                node = rotateRight(node);
-                info[3] = node;
-                if (info[2] != null) {
-                    info[4] = ImbalanceCases.LEFT_RIGHT;
-                } else {
-                    info[4] = ImbalanceCases.LEFT_LEFT;
-                }
-                backtrackingADT.addFirst(info);
-            } else if (balance < -1) {
-                if (value < node.right.value) {
-                    node.right = rotateRight(node.right);
-                    info[2] = node.right;
-                }
-
-                node = rotateLeft(node);
-                info[3] = node;
-                if (info[2] != null) {
-                    info[4] = ImbalanceCases.RIGHT_LEFT;
-                } else {
-                    info[4] = ImbalanceCases.RIGHT_RIGHT;
-                }
-                backtrackingADT.addFirst(info);
+        if (balance > 1) {
+            if (value > node.left.value) {
+                backtrackingADT.addFirst(ImbalanceCases.LEFT_RIGHT);
+                backtrackingADT.addFirst(node.left);
+                node.left = rotateLeft(node.left);
             }
-            if (info[4] == null && node.equals(root)) {
-                info[4] = ImbalanceCases.NO_IMBALANCE;
-                backtrackingADT.addFirst(info);
+            else {
+                backtrackingADT.addFirst(ImbalanceCases.LEFT_LEFT);
+            }
+            node = rotateRight(node);
+            backtrackingADT.addFirst(node);
+        } else if (balance < -1) {
+            if (value < node.right.value) {
+                backtrackingADT.addFirst(ImbalanceCases.RIGHT_LEFT);
+                backtrackingADT.addFirst(node.right);
+                node.right = rotateRight(node.right);
+            }
+            else {
+                backtrackingADT.addFirst(ImbalanceCases.RIGHT_RIGHT);
+            }
+            node = rotateLeft(node);
+            backtrackingADT.addFirst(node);
+        }
+        if (node.equals(root)) {
+            Object firstOut = backtrackingADT.removeFirst();
+            Object secondOut = backtrackingADT.removeFirst();
+            if (secondOut.equals(ImbalanceCases.RIGHT_RIGHT) || secondOut.equals(ImbalanceCases.LEFT_LEFT)) {
+                backtrackingADT.addFirst(secondOut);
+                backtrackingADT.addFirst(firstOut);
+            } else {
+                Object thirdOut = backtrackingADT.removeFirst();
+                if (thirdOut.equals(ImbalanceCases.RIGHT_LEFT) || thirdOut.equals(ImbalanceCases.LEFT_RIGHT)) {
+                    backtrackingADT.addFirst(thirdOut);
+                    backtrackingADT.addFirst(secondOut);
+                    backtrackingADT.addFirst(firstOut);
+                } else {
+                    backtrackingADT.addFirst(thirdOut);
+                    backtrackingADT.addFirst(secondOut);
+                    backtrackingADT.addFirst(firstOut);
+                    backtrackingADT.addFirst(ImbalanceCases.NO_IMBALANCE);
+                }
             }
         }
+
 
         return node;
     }
