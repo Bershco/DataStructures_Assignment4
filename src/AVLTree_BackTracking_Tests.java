@@ -33,13 +33,12 @@ public class AVLTree_BackTracking_Tests {
     public static void main(String[] args) {
 
         boolean Read_The_Instructions = true;
-        if(Read_The_Instructions == false) throw new RuntimeException("READ THE INSTRUCTIONS FIRST!");
+        if (Read_The_Instructions == false) throw new RuntimeException("READ THE INSTRUCTIONS FIRST!");
 
         // main tests
         //mainTests();
-        AVLTreeDebugging(new int[]{474, 142, 357, -183, 386, 486, -94, -266, -382, -353, -96, 320, -54, -40, 468});
+        AVLTreeDebugging(new int[]{293, -126, -457, -336, -66, 193, 436, 59, 67, 44, -194, 217, -326, -251, -456});
     }
-
     public static void AVLTreeDebugging(int[] nums){
 
         /** You can add code here for debugging
@@ -53,7 +52,8 @@ public class AVLTree_BackTracking_Tests {
         System.out.println("=====================");
         for(int i = 0; i< nums.length;i++){
             tree.Backtrack();
-            tree.printTree();
+            //tree.printTree();
+            System.out.println(treeToString(tree));
             System.out.println("=====================");
         }
     }
