@@ -158,7 +158,7 @@ public class BacktrackingAVL extends AVLTree {
      * This method is an example of an AVL tree that after backtracking insertion is different from deleting the inserted Node
      * @return a list of Integers that is representing the tree
      */
-    public static List<Integer> AVLTreeBacktrackingCou1nterExample() {
+    public static List<Integer> AVLTreeBacktrackingCounterExample() {
         return Arrays.asList(2,1,5,3,6,4);
     }
 
