@@ -50,6 +50,17 @@ public class AVLTree implements Iterable<Integer> {
                 return (right != null) ? right.helpSelect(index-rank) : -1;
             }
         }
+        protected void decreaseSize(int _value) {
+            if (right != null || left != null) {
+                size--;
+            }
+            if (value > _value && left != null) {
+                left.decreaseSize(_value);
+            }
+            else if (right != null){
+                right.decreaseSize(_value);
+            }
+        }
     }
     
     protected Node root;
@@ -94,7 +105,6 @@ public class AVLTree implements Iterable<Integer> {
                 backtrackingADT.addFirst(node); //inserted node's parent
             }
         }
-        //this will happen only once - when 'node' is info[0]'s parent
         node.size++;
         node.updateHeight();
 

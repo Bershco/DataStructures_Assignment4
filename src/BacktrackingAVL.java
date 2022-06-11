@@ -133,6 +133,7 @@ public class BacktrackingAVL extends AVLTree {
             _parent.size--;
             _parent = _parent.parent;
         }
+        root.decreaseSize(child.value);
     }
     private void fixRoot() {
         if (root.parent != null) {
