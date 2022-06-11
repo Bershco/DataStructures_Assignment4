@@ -35,7 +35,6 @@ public class BTree<T extends Comparable<T>> {
         maxDegree = 2 * order;
     }
 
-    //You may add line of code to the "insert" function below.
     /**
      * Insert the value into this BTree
      * 
@@ -54,15 +53,11 @@ public class BTree<T extends Comparable<T>> {
             	// If the node has 2t-1 keys then split it
                 if (currentNode.getNumberOfKeys() == maxDegree - 1) {
                 	split(currentNode);
-
-
-
                 	// Return to the parent and descend to the needed node
                 	currentNode = currentNode.parent != null ? currentNode.parent : root;
                     int idx = currentNode.getValuePosition(value);
                     currentNode = currentNode.getChild(idx);
                 }
-                
                 // Descend the tree and add the key to a leaf
                 if (currentNode.isLeaf()) {
                 	currentNode.addKey(value);

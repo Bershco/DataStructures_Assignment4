@@ -11,10 +11,10 @@ public class  BacktrackingBTree<T extends Comparable<T>> extends BTree<T> {
 		super(order);
 	}
 
-	//You are to implement the function Backtrack.
+	/**
+	 * This method backtracks the insertion method in B Trees
+	 */
 	public void Backtrack() {
-
-		// You should remove the next two lines, after double-checking that the signature is valid!
 		if(root!=null) {
 			if (root.numOfChildren == 0) {
 				if (root.getNumberOfKeys() == 1) {
@@ -48,18 +48,17 @@ public class  BacktrackingBTree<T extends Comparable<T>> extends BTree<T> {
 						parent.removeChild(this.getNode(value));
 						parent.addChild(left);
 					}
-
-
-
-
 				}
 				size--;
 			}
 		}
 
     }
-	
-	//Change the list returned to a list of integers answering the requirements
+
+	/**
+	 * This method is an example of a B tree that after backtracking insertion is different from deleting the inserted Node
+	 * @return a list of Integers that is representing the tree
+	 */
 	public static List<Integer> BTreeBacktrackingCounterExample(){
 		List<Integer> difference = new LinkedList<>();
 		int curr = 1;
