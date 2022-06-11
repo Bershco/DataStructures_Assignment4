@@ -5,9 +5,7 @@ import java.util.*;
 public class BTree<T extends Comparable<T>> {
 
     final private int maxDegree;
-    //protected Stack<Object[]> backtrackingStack = new Stack<>();
     protected Deque<Object[]> backtrackingDLL = new ArrayDeque<>();
-    // [ value ] , [ isLeaf ] , [ wasSplit ] , [ LeftNode ] , [ RightNode ]
     protected Node<T> root = null;
     protected int size = 0;
     
@@ -35,6 +33,7 @@ public class BTree<T extends Comparable<T>> {
         maxDegree = 2 * order;
     }
 
+    //You may add line of code to the "insert" function below.
     /**
      * Insert the value into this BTree
      * 
@@ -44,24 +43,40 @@ public class BTree<T extends Comparable<T>> {
         if (root == null) {
             root = new Node<T>(null, maxDegree);
             root.addKey(value);
-            Object[] obj = {value,true,false,null,null} ;
-            backtrackingDLL.add(obj);
+            Object[] obj = {value,null} ;
+            backtrackingDLL.addFirst(obj);
         } else {
             Node<T> currentNode = root;
             boolean wasAdded = false;
+            boolean wasSplited = false;
             while (currentNode != null && !wasAdded) {
             	// If the node has 2t-1 keys then split it
                 if (currentNode.getNumberOfKeys() == maxDegree - 1) {
+
+                    wasSplited = true;
+
+                    int numberOfKeys = currentNode.getNumberOfKeys();
+                    int medianIndex = numberOfKeys / 2;
+                    T medianValue = currentNode.getKey(medianIndex);
+                    Object[] toAdd = {value,medianValue}; //if split was made {[value], [value that went up]}
+                    backtrackingDLL.addFirst(toAdd);
+
                 	split(currentNode);
+
                 	// Return to the parent and descend to the needed node
                 	currentNode = currentNode.parent != null ? currentNode.parent : root;
                     int idx = currentNode.getValuePosition(value);
                     currentNode = currentNode.getChild(idx);
                 }
+                
                 // Descend the tree and add the key to a leaf
                 if (currentNode.isLeaf()) {
                 	currentNode.addKey(value);
                 	wasAdded = true;
+                    if(wasSplited==false){ //if did not split
+                        Object[] toAdd = {value,null};
+                        backtrackingDLL.addFirst(toAdd);
+                    }
                 } else {
                     int idx = currentNode.getValuePosition(value);
                     currentNode = currentNode.getChild(idx);
@@ -390,7 +405,7 @@ public class BTree<T extends Comparable<T>> {
         }
 
         private static <T extends Comparable<T>> String getString(Node<T> node, String prefix, boolean isTail) {
-            StringBuilder builder = new StringBuilder();
+                StringBuilder builder = new StringBuilder();
 
             builder.append(prefix).append((isTail ? "~~~ " : "|-- "));
             for (int i = 0; i < node.getNumberOfKeys(); ++i) {
