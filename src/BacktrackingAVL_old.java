@@ -1,9 +1,9 @@
 import java.util.Arrays;
 import java.util.List;
 
-public class BacktrackingAVL extends AVLTree {
+public class BacktrackingAVL_old extends AVLTree_old {
     // For clarity only, this is the default ctor created implicitly.
-    public BacktrackingAVL() {
+    public BacktrackingAVL_old() {
         super();
     }
 

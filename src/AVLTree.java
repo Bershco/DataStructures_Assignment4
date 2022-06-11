@@ -1,8 +1,4 @@
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.*;
 
 public class AVLTree implements Iterable<Integer> {
     // You may edit the following nested class:
@@ -12,6 +8,7 @@ public class AVLTree implements Iterable<Integer> {
     	public Node parent = null;
     	public int height = 0;
     	public int value;
+        protected int size = 1;
 
     	public Node(int val) {
             this.value = val;
@@ -30,11 +27,35 @@ public class AVLTree implements Iterable<Integer> {
 
             return leftHeight - rightHeight;
         }
+        protected int helpRank(int _value) {
+            if (value == _value) {
+                return (left != null) ? left.size : 0;
+            }
+            else if (value > _value) {
+                return (left != null) ? left.helpRank(_value) : 0;
+            }
+            else {
+                return (right != null) ? right.helpRank(_value) + ((left != null) ? left.size + 1 : 1) : ((left != null) ? left.size + 1 : 1);
+            }
+        }
+        protected int helpSelect(int index) {
+            int rank = (left != null) ? left.size + 1 : 1;
+            if (rank == index) {
+                return value;
+            }
+            else if (rank > index) {
+                return (left != null) ? left.helpSelect(index) : -1;
+            }
+            else {
+                return (right != null) ? right.helpSelect(index-rank) : -1;
+            }
+        }
     }
     
     protected Node root;
     
     //You may add fields here.
+    protected Deque<Object> backtrackingADT = new ArrayDeque<>();
     
     public AVLTree() {
     	this.root = null;
@@ -45,24 +66,36 @@ public class AVLTree implements Iterable<Integer> {
      */
 	public void insert(int value) {
     	root = insertNode(root, value);
+        if (root.right == null && root.left == null) {
+            backtrackingADT.addFirst(ImbalanceCases.NO_IMBALANCE);
+            backtrackingADT.addFirst(ImbalanceCases.NO_IMBALANCE); // filler for the backtrack method
+        }
     }
 	
 	protected Node insertNode(Node node, int value) {
-	    // Perform regular BST insertion
+        // Perform regular BST insertion
         if (node == null) {
         	Node insertedNode = new Node(value);
+            backtrackingADT.addFirst(insertedNode);
             return insertedNode;
         }
 
         if (value < node.value) {
-            node.left  = insertNode(node.left, value);
+            node.left = insertNode(node.left, value);
             node.left.parent = node;
+            if (node.left.right == null && node.left.left == null) {
+                backtrackingADT.addFirst(node); //inserted node's parent
+            }
         }
         else {
             node.right = insertNode(node.right, value);
             node.right.parent = node;
+            if (node.right.right == null && node.right.left == null) {
+                backtrackingADT.addFirst(node); //inserted node's parent
+            }
         }
-            
+        //this will happen only once - when 'node' is info[0]'s parent
+        node.size++;
         node.updateHeight();
 
         /* 
@@ -71,20 +104,50 @@ public class AVLTree implements Iterable<Integer> {
          */
         
         int balance = node.getBalanceFactor();
-        
         if (balance > 1) {
             if (value > node.left.value) {
+                backtrackingADT.addFirst(ImbalanceCases.LEFT_RIGHT);
+                backtrackingADT.addFirst(node.left);
                 node.left = rotateLeft(node.left);
             }
-            
+            else {
+                backtrackingADT.addFirst(ImbalanceCases.LEFT_LEFT);
+            }
             node = rotateRight(node);
+            backtrackingADT.addFirst(node);
         } else if (balance < -1) {
             if (value < node.right.value) {
+                backtrackingADT.addFirst(ImbalanceCases.RIGHT_LEFT);
+                backtrackingADT.addFirst(node.right);
                 node.right = rotateRight(node.right);
             }
-            
+            else {
+                backtrackingADT.addFirst(ImbalanceCases.RIGHT_RIGHT);
+            }
             node = rotateLeft(node);
+            backtrackingADT.addFirst(node);
         }
+        if (node.equals(root)) {
+            Object firstOut = backtrackingADT.removeFirst();
+            Object secondOut = backtrackingADT.removeFirst();
+            if (secondOut.equals(ImbalanceCases.RIGHT_RIGHT) || secondOut.equals(ImbalanceCases.LEFT_LEFT)) {
+                backtrackingADT.addFirst(secondOut);
+                backtrackingADT.addFirst(firstOut);
+            } else {
+                Object thirdOut = backtrackingADT.removeFirst();
+                if (thirdOut.equals(ImbalanceCases.RIGHT_LEFT) || thirdOut.equals(ImbalanceCases.LEFT_RIGHT)) {
+                    backtrackingADT.addFirst(thirdOut);
+                    backtrackingADT.addFirst(secondOut);
+                    backtrackingADT.addFirst(firstOut);
+                } else {
+                    backtrackingADT.addFirst(thirdOut);
+                    backtrackingADT.addFirst(secondOut);
+                    backtrackingADT.addFirst(firstOut);
+                    backtrackingADT.addFirst(ImbalanceCases.NO_IMBALANCE);
+                }
+            }
+        }
+
 
         return node;
     }
@@ -109,6 +172,13 @@ public class AVLTree implements Iterable<Integer> {
         y.updateHeight();
         x.updateHeight();
 
+        /*
+            Now properly adjusting sizes - x is exactly where y was before, and now y is x's right child -
+            meaning its size is as x minus the left child (if exists) minus 1.
+         */
+        x.size = y.size;
+        y.size = (x.left != null) ? x.size - x.left.size -1 : x.size - 1;
+
         // Return new root
         return x;
     }
@@ -131,6 +201,13 @@ public class AVLTree implements Iterable<Integer> {
         
         x.updateHeight();
         y.updateHeight();
+
+         /*
+            Now properly adjusting sizes - y is exactly where x was before, and now x is y's left child -
+            meaning its size is as y minus the right child (if exists) minus 1.
+         */
+        y.size = x.size;
+        x.size = (y.right != null) ? y.size - y.right.size -1 : y.size - 1;
 
         // Return new root
         return y;
