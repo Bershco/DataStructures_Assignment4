@@ -27,6 +27,12 @@ public class AVLTree implements Iterable<Integer> {
 
             return leftHeight - rightHeight;
         }
+
+        /**
+         * This method is a helper method to the method rank in BacktrackingAVL
+         * @param _value the value to check
+         * @return the amount of Nodes that their value is lower than 'value'
+         */
         protected int helpRank(int _value) {
             if (value == _value) {
                 return (left != null) ? left.size : 0;
@@ -38,6 +44,12 @@ public class AVLTree implements Iterable<Integer> {
                 return (right != null) ? right.helpRank(_value) + ((left != null) ? left.size + 1 : 1) : ((left != null) ? left.size + 1 : 1);
             }
         }
+
+        /**
+         * This method is a helper method to the method select in BacktrackingAVL
+         * @param index the index of the Node, given that the tree is in-order
+         * @return the value within the node in the <code>index</code> place
+         */
         protected int helpSelect(int index) {
             int rank = (left != null) ? left.size + 1 : 1;
             if (rank == index) {
@@ -50,6 +62,11 @@ public class AVLTree implements Iterable<Integer> {
                 return (right != null) ? right.helpSelect(index-rank) : -1;
             }
         }
+
+        /**
+         * This method fixes the size fields of ancestor nodes of the inserted (in order to help backtracking)
+         * @param _value the (un)inserted Node's value
+         */
         protected void decreaseSize(int _value) {
             if (right != null || left != null) {
                 size--;
@@ -66,7 +83,7 @@ public class AVLTree implements Iterable<Integer> {
     protected Node root;
     
     //You may add fields here.
-    protected Deque<Object> backtrackingADT = new ArrayDeque<>();
+    protected Deque<Object> backtrackingDeque = new ArrayDeque<>();
     
     public AVLTree() {
     	this.root = null;
@@ -78,31 +95,36 @@ public class AVLTree implements Iterable<Integer> {
 	public void insert(int value) {
     	root = insertNode(root, value);
         if (root.right == null && root.left == null) {
-            backtrackingADT.addFirst(ImbalanceCases.NO_IMBALANCE);
-            backtrackingADT.addFirst(ImbalanceCases.NO_IMBALANCE); // filler for the backtrack method
+            backtrackingDeque.addFirst(ImbalanceCases.NO_IMBALANCE);
+            backtrackingDeque.addFirst(ImbalanceCases.NO_IMBALANCE); // filler for the backtrack method
         }
     }
-	
+
+    /**
+     * This method inserts a node into the AVL tree, whilst maintaining the backtracking deque
+     * @param node the next node to go through to get to the right place where the node needs to be placed
+     * @param value the value of the node to be inserted
+     * @return the child node, in order to keep the connections between nodes proper
+     */
 	protected Node insertNode(Node node, int value) {
         // Perform regular BST insertion
         if (node == null) {
         	Node insertedNode = new Node(value);
-            backtrackingADT.addFirst(insertedNode);
+            backtrackingDeque.addFirst(insertedNode);
             return insertedNode;
         }
-
         if (value < node.value) {
             node.left = insertNode(node.left, value);
             node.left.parent = node;
             if (node.left.right == null && node.left.left == null) {
-                backtrackingADT.addFirst(node); //inserted node's parent
+                backtrackingDeque.addFirst(node); //inserted node's parent
             }
         }
         else {
             node.right = insertNode(node.right, value);
             node.right.parent = node;
             if (node.right.right == null && node.right.left == null) {
-                backtrackingADT.addFirst(node); //inserted node's parent
+                backtrackingDeque.addFirst(node); //inserted node's parent
             }
         }
         node.size++;
@@ -116,53 +138,55 @@ public class AVLTree implements Iterable<Integer> {
         int balance = node.getBalanceFactor();
         if (balance > 1) {
             if (value > node.left.value) {
-                backtrackingADT.addFirst(ImbalanceCases.LEFT_RIGHT);
-                backtrackingADT.addFirst(node.left);
+                backtrackingDeque.addFirst(ImbalanceCases.LEFT_RIGHT);
+                backtrackingDeque.addFirst(node.left);
                 node.left = rotateLeft(node.left);
             }
             else {
-                backtrackingADT.addFirst(ImbalanceCases.LEFT_LEFT);
+                backtrackingDeque.addFirst(ImbalanceCases.LEFT_LEFT);
             }
             node = rotateRight(node);
-            backtrackingADT.addFirst(node);
+            backtrackingDeque.addFirst(node);
         } else if (balance < -1) {
             if (value < node.right.value) {
-                backtrackingADT.addFirst(ImbalanceCases.RIGHT_LEFT);
-                backtrackingADT.addFirst(node.right);
+                backtrackingDeque.addFirst(ImbalanceCases.RIGHT_LEFT);
+                backtrackingDeque.addFirst(node.right);
                 node.right = rotateRight(node.right);
             }
             else {
-                backtrackingADT.addFirst(ImbalanceCases.RIGHT_RIGHT);
+                backtrackingDeque.addFirst(ImbalanceCases.RIGHT_RIGHT);
             }
             node = rotateLeft(node);
-            backtrackingADT.addFirst(node);
+            backtrackingDeque.addFirst(node);
         }
         if (node.equals(root)) {
-            Object firstOut = backtrackingADT.removeFirst();
-            Object secondOut = backtrackingADT.removeFirst();
+            Object firstOut = backtrackingDeque.removeFirst();
+            Object secondOut = backtrackingDeque.removeFirst();
             if (secondOut.equals(ImbalanceCases.RIGHT_RIGHT) || secondOut.equals(ImbalanceCases.LEFT_LEFT)) {
-                backtrackingADT.addFirst(secondOut);
-                backtrackingADT.addFirst(firstOut);
+                backtrackingDeque.addFirst(secondOut);
+                backtrackingDeque.addFirst(firstOut);
             } else {
-                Object thirdOut = backtrackingADT.removeFirst();
+                Object thirdOut = backtrackingDeque.removeFirst();
                 if (thirdOut.equals(ImbalanceCases.RIGHT_LEFT) || thirdOut.equals(ImbalanceCases.LEFT_RIGHT)) {
-                    backtrackingADT.addFirst(thirdOut);
-                    backtrackingADT.addFirst(secondOut);
-                    backtrackingADT.addFirst(firstOut);
+                    backtrackingDeque.addFirst(thirdOut);
+                    backtrackingDeque.addFirst(secondOut);
+                    backtrackingDeque.addFirst(firstOut);
                 } else {
-                    backtrackingADT.addFirst(thirdOut);
-                    backtrackingADT.addFirst(secondOut);
-                    backtrackingADT.addFirst(firstOut);
-                    backtrackingADT.addFirst(ImbalanceCases.NO_IMBALANCE);
+                    backtrackingDeque.addFirst(thirdOut);
+                    backtrackingDeque.addFirst(secondOut);
+                    backtrackingDeque.addFirst(firstOut);
+                    backtrackingDeque.addFirst(ImbalanceCases.NO_IMBALANCE);
                 }
             }
         }
-
-
         return node;
     }
-    
-	// You may add additional code to the next two functions.
+
+    /**
+     * This method is the implementation of a right rotation in an AVL tree in insertion (and in backtracking of insertion) while maintaining the size field
+     * @param y the node to be rotated
+     * @return the new node in its place
+     */
     protected Node rotateRight(Node y) {
         Node x = y.left;
         Node T2 = x.right;
@@ -193,6 +217,11 @@ public class AVLTree implements Iterable<Integer> {
         return x;
     }
 
+    /**
+     * This method is the implementation of a left rotation in an AVL tree in insertion (and in backtracking of insertion) while maintaining the size field
+     * @param x the node to be rotated
+     * @return the new node in its place
+     */
     protected Node rotateLeft(Node x) {
         Node y = x.right;
         Node T2 = y.left;
