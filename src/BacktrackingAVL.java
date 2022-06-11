@@ -10,20 +10,22 @@ public class BacktrackingAVL extends AVLTree {
     /**
      * This method backtracks the insertion method in AVL Trees
      */
-    public void Backtrack() {
+    public void Backtrack() {               //a significant amount of Node declaration and assignment are for readability purposes -
+                                            //both the variable names and the decrease in amount of casting
         if (!backtrackingDeque.isEmpty()) {
             Object info1 = backtrackingDeque.removeFirst();
             Object info2 = backtrackingDeque.removeFirst();
             Object info3 = backtrackingDeque.removeFirst();
-            if (info1.equals(ImbalanceCases.NO_IMBALANCE)) {
-                if (info2.equals(ImbalanceCases.NO_IMBALANCE)) {
+            if (info1.equals(ImbalanceCases.NO_IMBALANCE)) { // the following lines are backtracking of simple insertions with no imbalances
+                if (info2.equals(ImbalanceCases.NO_IMBALANCE)) {    //if a root insertion was backtracked, both info1 and info2 will be NO_IMBALANCE
+                                                                    //because there's no need for root's parent - as it is null
                     root = null;
                     return;
                 }
                 Node parent = (Node) info2;
                 Node inserted = (Node) info3;
                 removeInserted(inserted,parent);
-            } else if (info2.equals(ImbalanceCases.LEFT_LEFT) || info2.equals(ImbalanceCases.RIGHT_RIGHT)) {
+            } else if (info2.equals(ImbalanceCases.LEFT_LEFT) || info2.equals(ImbalanceCases.RIGHT_RIGHT)) { // the following lines are backtracking of single rotations using rotateLeft or rotateRight
                 Node singleRotated = (Node) info1;
                 Node parent = (Node) info3;
                 Node inserted = (Node) backtrackingDeque.removeFirst();
@@ -63,7 +65,7 @@ public class BacktrackingAVL extends AVLTree {
                 removeInserted(inserted,parent);
                 fixRoot();
             }
-            else {
+            else { // the following lines are manual backtracking of double rotations (whether right-left or left-right)
                 Node rotatedSecond = (Node) info1;
                 Node rotatedFirst = (Node) info2;
                 Node parent = (Node) backtrackingDeque.removeFirst();
@@ -120,7 +122,7 @@ public class BacktrackingAVL extends AVLTree {
                 }
                 fixRoot();
                 removeInserted(inserted, parent);
-            }
+            } // end of manual double rotation backtracking
         }
     }
 

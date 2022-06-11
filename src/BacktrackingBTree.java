@@ -1,4 +1,4 @@
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
 public class  BacktrackingBTree<T extends Comparable<T>> extends BTree<T> {
@@ -11,11 +11,11 @@ public class  BacktrackingBTree<T extends Comparable<T>> extends BTree<T> {
 		super(order);
 	}
 
-	//You are to implement the function Backtrack.
+	/**
+	 * This method backtracks the insertion method in B Trees
+	 */
 	public void Backtrack() {
-
 		if (!backtrackingDLL.isEmpty()) { //we can not do backtrack if we did not add any keys to the tree
-
 			if (root.isLeaf() && root.getNumberOfKeys() == 1) { //there was one insert only
 				root.numOfKeys = 0;
 				root = null;
@@ -69,11 +69,6 @@ public class  BacktrackingBTree<T extends Comparable<T>> extends BTree<T> {
 
 		//Change the list returned to a list of integers answering the requirements
 		public static List<Integer> BTreeBacktrackingCounterExample () {
-			List<Integer> difference = new LinkedList<>();
-			int curr = 1;
-			while (curr < 7) {
-				difference.add(curr++);
-			}
-			return difference;
+			return Arrays.asList(1,2,3,4,5,6);
 		}
 	}
