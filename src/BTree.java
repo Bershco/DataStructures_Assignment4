@@ -1,7 +1,6 @@
 import java.util.*;
 
 
-@SuppressWarnings("unchecked")
 public class BTree<T extends Comparable<T>> {
 
     final private int maxDegree;
@@ -73,7 +72,7 @@ public class BTree<T extends Comparable<T>> {
                 if (currentNode.isLeaf()) {
                 	currentNode.addKey(value);
                 	wasAdded = true;
-                    if(wasSplited==false){ //if did not split
+                    if(!wasSplited){ //if did not split
                         Object[] toAdd = {value,null};
                         backtrackingDLL.addFirst(toAdd);
                     }
